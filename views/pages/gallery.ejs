@@ -1,0 +1,120 @@
+<%- include('../partials/header', { title: 'Gallery - Event Management', currentPage: 'gallery' }) %>
+<%- include('../partials/navbar', { user: user, currentPage: 'gallery' }) %>
+
+<div class="container py-5">
+    <h1 class="display-5 fw-bold mb-5 text-center">Our Event Gallery</h1>
+    
+    <ul class="nav nav-tabs justify-content-center mb-5" id="galleryTabs">
+        <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#wedding">Wedding Events</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#corporate">Corporate Events</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#birthday">Birthday Parties</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#concert">Concerts</button>
+        </li>
+    </ul>
+    
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="wedding">
+            <div class="row g-4">
+                <% for(let i = 1; i <= 9; i++) { %>
+                <div class="col-lg-4 col-md-6">
+                    <div class="gallery-item">
+                        <img src="https://images.unsplash.com/photo-<%= i === 1 ? '1519225421980-715cb0215aed' : i === 2 ? '1519741497674-611481863552' : i === 3 ? '1465495976277-d9784ee16ecd' : i === 4 ? '1511285560929-80b456fea0bc' : i === 5 ? '1511795409834-69f9d8d29c59' : i === 6 ? '1519167758481-83f550bb49b3' : i === 7 ? '1511988617509-2988f6f8c0ce' : i === 8 ? '1464366400600-716a46b56e34' : '1523438885200-e835ba1c57e8' %>?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                             class="img-fluid rounded gallery-img" 
+                             alt="Wedding Event <%= i %>"
+                             style="height: 250px; width: 100%; object-fit: cover; cursor: pointer;">
+                        <div class="text-center mt-2">
+                            <h6>Wedding Celebration <%= i %></h6>
+                            <small class="text-muted">Elegant and beautiful wedding setup</small>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </div>
+        
+        <div class="tab-pane fade" id="corporate">
+            <div class="row g-4">
+                <% for(let i = 1; i <= 6; i++) { %>
+                <div class="col-lg-4 col-md-6">
+                    <div class="gallery-item">
+                        <img src="https://images.unsplash.com/photo-<%= i === 1 ? '1542744173-8e7e51315f50' : i === 2 ? '1497366216548-37526070297c' : i === 3 ? '1542744095-fcf48d80b0fd' : i === 4 ? '1542744094-03b4b2c12d8c' : i === 5 ? '1542744094-03b4b2c12d8c' : '1542744095-fcf48d80b0fd' %>?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                             class="img-fluid rounded gallery-img" 
+                             alt="Corporate Event <%= i %>"
+                             style="height: 250px; width: 100%; object-fit: cover; cursor: pointer;">
+                        <div class="text-center mt-2">
+                            <h6>Corporate Meeting <%= i %></h6>
+                            <small class="text-muted">Professional corporate event setup</small>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </div>
+        
+        <div class="tab-pane fade" id="birthday">
+            <div class="row g-4">
+                <% for(let i = 1; i <= 6; i++) { %>
+                <div class="col-lg-4 col-md-6">
+                    <div class="gallery-item">
+                        <img src="https://images.unsplash.com/photo-<%= i === 1 ? '1530103862676-de8c9debad1d' : i === 2 ? '1532117182044-31e9d7f4c15f' : i === 3 ? '1526402973497-6c8e8f8c8f8f' : i === 4 ? '1511795409834-69f9d8d29c59' : i === 5 ? '1511795409834-69f9d8d29c59' : '1511795409834-69f9d8d29c59' %>?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                             class="img-fluid rounded gallery-img" 
+                             alt="Birthday Party <%= i %>"
+                             style="height: 250px; width: 100%; object-fit: cover; cursor: pointer;">
+                        <div class="text-center mt-2">
+                            <h6>Birthday Party <%= i %></h6>
+                            <small class="text-muted">Fun and colorful birthday celebration</small>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </div>
+        
+        <div class="tab-pane fade" id="concert">
+            <div class="row g-4">
+                <% for(let i = 1; i <= 6; i++) { %>
+                <div class="col-lg-4 col-md-6">
+                    <div class="gallery-item">
+                        <img src="https://images.unsplash.com/photo-<%= i === 1 ? '1493225457124-a3eb161ffa5f' : i === 2 ? '1511679092591-8a4e7a8a5c7c' : i === 3 ? '1511679092591-8a4e7a8a5c7c' : i === 4 ? '1493225457124-a3eb161ffa5f' : i === 5 ? '1511679092591-8a4e7a8a5c7c' : '1493225457124-a3eb161ffa5f' %>?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                             class="img-fluid rounded gallery-img" 
+                             alt="Concert <%= i %>"
+                             style="height: 250px; width: 100%; object-fit: cover; cursor: pointer;">
+                        <div class="text-center mt-2">
+                            <h6>Music Concert <%= i %></h6>
+                            <small class="text-muted">Live music performance event</small>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCaption">Image Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid rounded" alt="Preview">
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/script.js"></script>
+</body>
+</html>

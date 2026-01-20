@@ -1,0 +1,359 @@
+<%- include('../partials/header', { title: 'Dashboard - Event Management', currentPage: 'dashboard' }) %>
+<%- include('../partials/navbar', { user: user, currentPage: 'dashboard' }) %>
+
+<div class="dashboard-container">
+    <div class="container py-5">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3">
+                <div class="sidebar mb-4">
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <i class="fas fa-user-circle fa-4x text-primary"></i>
+                        </div>
+                        <h5><%= user.username %></h5>
+                        <p class="text-muted mb-0"><%= user.email %></p>
+                        <span class="badge bg-info mt-2"><%= user.role %></span>
+                    </div>
+                    
+                   <ul class="sidebar-menu">
+    <ul class="sidebar-menu">
+    <li><a href="/dashboard" class="active"><i class="fas fa-tachometer-alt me-2"></i> Overview</a></li>
+    <li><a href="/dashboard?tab=bookings"><i class="fas fa-calendar-check me-2"></i> My Bookings</a></li>
+    <li><a href="/dashboard?tab=events"><i class="fas fa-calendar-plus me-2"></i> Book Event</a></li>
+
+    <!-- Calendar Link -->
+    <li>
+        <a href="javascript:void(0)" id="viewCalendarBtn">
+            <i class="fas fa-calendar-alt me-2"></i> View Calendar
+        </a>
+    </li>
+
+    <li><a href="/dashboard?tab=payments"><i class="fas fa-credit-card me-2"></i> Payments</a></li>
+    <li><a href="/dashboard?tab=notifications"><i class="fas fa-bell me-2"></i> Notifications</a></li>
+    <li><a href="/dashboard?tab=profile"><i class="fas fa-user-cog me-2"></i> Profile Settings</a></li>
+    <li><a href="/logout" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+</ul>
+
+
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="dashboard-card">
+                    <h3 class="mb-4">Welcome back, <%= user.full_name || user.username %>!</h3>
+                    
+                    <!-- Stats Overview -->
+                    <div class="row mb-5">
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-primary bg-opacity-10">
+                                <div class="card-body text-center">
+                                    <h2 class="text-primary">3</h2>
+                                    <p class="text-muted mb-0">Upcoming Events</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-success bg-opacity-10">
+                                <div class="card-body text-center">
+                                    <h2 class="text-success">8</h2>
+                                    <p class="text-muted mb-0">Total Bookings</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-warning bg-opacity-10">
+                                <div class="card-body text-center">
+                                    <h2 class="text-warning">₹1,250</h2>
+                                    <p class="text-muted mb-0">Total Spent</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-info bg-opacity-10">
+                                <div class="card-body text-center">
+                                    <h2 class="text-info">2</h2>
+                                    <p class="text-muted mb-0">Pending</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--callender-->
+                    <!-- Calendar Modal -->
+
+<!-- Calendar Modal -->
+<div id="calendarModal" class="calendar-modal" style="display:none;">
+  <div class="calendar-modal-content">
+    <span id="closeCalendar" class="calendar-close">&times;</span>
+    <div id="calendarLoading" style="display:none; padding:12px; text-align:center;">Loading calendar...</div>
+    <div id="calendar" style="min-height:300px;"></div>
+  </div>
+</div>
+
+
+                    <!-- Recent Bookings -->
+                    <h4 class="mb-4">Recent Bookings</h4>
+                    
+                    <% if (bookings && bookings.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Date</th>
+                                        <th>Guests</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% bookings.forEach(booking => { %>
+                                    <tr>
+                                        <td>
+                                            <strong>Event #<%= booking.event_id %></strong><br>
+                                            <small class="text-muted">Wedding Package</small>
+                                        </td>
+                                        <td><%= new Date(booking.created_at).toLocaleDateString() %></td>
+
+                                        <td><%= booking.guest_count %></td>
+                                        <td>₹<%= booking.total_amount %></td>
+                                        <td>
+                                            <% if (booking.status === 'confirmed') { %>
+                                                <span class="badge bg-success">Confirmed</span>
+                                            <% } else if (booking.status === 'pending') { %>
+                                                <span class="badge bg-warning">Pending</span>
+                                            <% } else if (booking.status === 'cancelled') { %>
+                                                <span class="badge bg-danger">Cancelled</span>
+                                            <% } else { %>
+                                                <span class="badge bg-info">Completed</span>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">View</button>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h5>No bookings yet</h5>
+                            <p class="text-muted">Start by booking your first event!</p>
+                            <a href="/events" class="btn btn-primary">Browse Events</a>
+                        </div>
+                    <% } %>
+                    
+                    <!-- Quick Actions -->
+                    <div class="row mt-5">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Quick Book</h5>
+                                    <p class="card-text text-muted">Book a new event in minutes</p>
+                                    <a href="/events" class="btn btn-primary">Book Now</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">View Calendar</h5>
+                                    <p class="card-text text-muted">See all your events on calendar</p>
+                                    <a href="javascript:void(0)" id="viewCalendarBtn" class="btn btn-outline-primary">
+    View Calendar
+</a>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FullCalendar JS (global builds) -->
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.20/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.20/index.global.min.js"></script>
+
+<script>
+// Attach the click handler to all elements with id 'viewCalendarBtn' (there are two on the page)
+document.querySelectorAll('#viewCalendarBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        console.log('[Calendar] viewCalendarBtn clicked');
+        const modal = document.getElementById('calendarModal');
+        if (modal) modal.style.display = 'flex';
+        // show loading indicator
+        const loader = document.getElementById('calendarLoading');
+        if (loader) { loader.style.display = 'block'; loader.textContent = 'Loading calendar...'; }
+        initCalendar();
+    });
+});
+
+document.getElementById('closeCalendar').addEventListener('click', () => {
+    console.log('[Calendar] close clicked');
+    document.getElementById('calendarModal').style.display = 'none';
+});
+
+// Helper to load a script dynamically
+function loadScript(url) {
+    return new Promise((resolve, reject) => {
+        if (document.querySelector(`script[src="${url}"]`)) return resolve();
+        const s = document.createElement('script');
+        s.src = url;
+        s.async = true;
+        s.onload = () => { console.log('[Calendar] loaded script', url); resolve(); };
+        s.onerror = () => reject(new Error('Failed to load ' + url));
+        document.body.appendChild(s);
+    });
+}
+
+// Initialize the calendar only once
+let calendarLoaded = false;
+function initCalendar() {
+    console.log('[Calendar] initCalendar called, loaded=', calendarLoaded);
+    if (calendarLoaded) return;
+
+    const coreUrl = 'https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.20/index.global.min.js';
+    const daygridUrl = 'https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.20/index.global.min.js';
+
+    // Ensure core and daygrid plugin are loaded
+    const ensurePlugins = Promise.resolve()
+        .then(() => {
+            if (typeof FullCalendar === 'undefined') {
+                console.log('[Calendar] FullCalendar core not found, loading...');
+                return loadScript(coreUrl);
+            }
+        })
+        .then(() => {
+            // Try to locate an existing DayGrid plugin on the globals
+            let plugin = (typeof FullCalendarDayGrid !== 'undefined' ? FullCalendarDayGrid : (FullCalendar && (FullCalendar.DayGridPlugin || FullCalendar.dayGridPlugin || FullCalendar.DayGrid)) ? (FullCalendar.DayGridPlugin || FullCalendar.dayGridPlugin || FullCalendar.DayGrid) : null);
+
+            if (!plugin) {
+                console.log('[Calendar] DayGrid plugin not found, loading...');
+                return loadScript(daygridUrl).then(() => {
+                    // After loading, try several standard global names and scan the FullCalendar object as a fallback
+                    plugin = (typeof FullCalendarDayGrid !== 'undefined' ? FullCalendarDayGrid : (FullCalendar && (FullCalendar.DayGridPlugin || FullCalendar.dayGridPlugin || FullCalendar.DayGrid)) ? (FullCalendar.DayGridPlugin || FullCalendar.dayGridPlugin || FullCalendar.DayGrid) : null);
+
+                    if (!plugin && typeof FullCalendar !== 'undefined') {
+                        try {
+                            const keys = Object.keys(FullCalendar || {});
+                            console.log('[Calendar] FullCalendar keys after load:', keys);
+                            const foundKey = keys.find(k => k.toLowerCase().includes('daygrid'));
+                            if (foundKey) plugin = FullCalendar[foundKey];
+                        } catch (e) {
+                            console.warn('[Calendar] Failed to scan FullCalendar keys', e);
+                        }
+                    }
+
+                    return plugin;
+                });
+            }
+            return plugin;
+        });
+
+    ensurePlugins
+    .then(plugin => {
+        if (!plugin) throw new Error('DayGrid plugin unavailable after load');
+
+        // Now fetch booked dates (expecting JSON)
+        return fetch('/api/booked-dates', { headers: { 'Accept': 'application/json' } })
+            .then(res => {
+                if (res.status === 401) throw new Error('Unauthorized (session expired). Please log in again.');
+
+                const contentType = (res.headers.get('content-type') || '').toLowerCase();
+
+                if (!res.ok) {
+                    return res.text().then(txt => { throw new Error('API error: ' + (txt || res.status)); });
+                }
+
+                if (!contentType.includes('application/json')) {
+                    return res.text().then(txt => { throw new Error('Unexpected response from server: ' + (txt ? txt.slice(0,200) : 'no content')); });
+                }
+
+                return res.json();
+            })
+            .then(bookedDates => ({ plugin, bookedDates }));
+    })
+    .then(({ plugin, bookedDates }) => {
+        console.log('[Calendar] bookedDates received:', bookedDates);
+        const raw = Array.isArray(bookedDates) ? bookedDates : [];
+        // Normalize incoming values: strings -> event objects, objects passed through
+        const events = raw.map(item => {
+            if (!item) return null;
+            if (typeof item === 'string') return { title: 'Booked', start: item, color: '#d9534f', allDay: true };
+            if (typeof item === 'object' && item.start) return Object.assign({ color: '#d9534f', allDay: true, title: (item.title||'Booked') }, item);
+            return null;
+        }).filter(Boolean);
+
+        const calendarEl = document.getElementById('calendar');
+
+        // If no events, show friendly message in loader area
+        const loader = document.getElementById('calendarLoading');
+        if (events.length === 0 && loader) {
+            loader.textContent = 'No booked dates found';
+            loader.style.display = 'block';
+        } else if (loader) {
+            loader.style.display = 'none';
+        }
+
+        // Final check
+        if (typeof FullCalendar === 'undefined' || !plugin) {
+            console.error('[Calendar] required FullCalendar objects still missing');
+            if (loader) loader.textContent = 'Calendar components missing';
+            return;
+        }
+
+        // Normalize plugin (handle default exports, arrays, and common global names)
+        let pluginToUse = plugin;
+        if (pluginToUse && pluginToUse.default) pluginToUse = pluginToUse.default;
+        if (!pluginToUse) {
+            // Try fallback global names directly from FullCalendar
+            pluginToUse = (FullCalendar && (FullCalendar.DayGrid || FullCalendar.DayGridPlugin || FullCalendar.dayGridPlugin || FullCalendar.dayGrid)) ? (FullCalendar.DayGrid || FullCalendar.DayGridPlugin || FullCalendar.dayGridPlugin || FullCalendar.dayGrid) : null;
+        }
+        if (pluginToUse && !Array.isArray(pluginToUse)) pluginToUse = [pluginToUse];
+        if (!pluginToUse) pluginToUse = [];
+
+        // If still empty, attempt fallback to automatic registration (no plugins option)
+        try {
+            console.log('[Calendar] pluginToUse:', pluginToUse, 'isArray:', Array.isArray(pluginToUse));
+
+            const calendarOptions = {
+                initialView: 'dayGridMonth',
+                events: events,
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: ''
+                }
+            };
+
+            if (pluginToUse.length > 0) calendarOptions.plugins = pluginToUse;
+
+            const calendar = new FullCalendar.Calendar(calendarEl, calendarOptions);
+
+            calendar.render();
+            calendarLoaded = true;
+
+            if (loader) loader.style.display = 'none';
+        } catch (err) {
+            console.error('[Calendar] FullCalendar instantiation failed. plugin:', plugin, 'normalized:', pluginToUse, err);
+            if (loader) loader.textContent = 'Calendar initialization error: ' + (err && err.message ? err.message : String(err)).slice(0,200);
+        }
+
+        if (loader) loader.style.display = 'none';
+    })
+    .catch(err => {
+        console.error('[Calendar] Error initializing calendar:', err);
+        const loader = document.getElementById('calendarLoading');
+        if (loader) loader.textContent = 'Error loading calendar';
+    });
+}
+</script>
+</body>
+</html>

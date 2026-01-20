@@ -1,0 +1,164 @@
+<div class="dashboard-header">
+    <h1>⚙️ Services Management</h1>
+    <p>Create and manage all event services.</p>
+    <div class="header-actions">
+        <button class="btn btn-primary" onclick="openModal('serviceModal')">➕ Add New Service</button>
+    </div>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if(services && services.length > 0) { %>
+                <% services.forEach(service => { %>
+                    <tr class="service-row" data-category="<%= service.category %>">
+                        <td><strong>#<%= service.id %></strong></td>
+                        <td><strong><%= service.name %></strong></td>
+                        <td>
+                            <span class="badge badge-info">
+                                <%= service.category.charAt(0).toUpperCase() + service.category.slice(1) %>
+                            </span>
+                        </td>
+                        <td><small><%= service.description.substring(0, 60) %>...</small></td>
+                        <td><strong>$<%= parseFloat(service.price).toFixed(2) %></strong></td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="openServiceDetails(<%= service.id %>)">👁️ View</button>
+                            <button class="btn btn-warning" style="padding: 5px 10px; font-size: 12px;" onclick="openEditServiceModal(<%= service.id %>, '<%= service.name %>', '<%= service.price %>')">✏️ Edit</button>
+                            <form method="POST" action="/admin/services/<%= service.id %>/delete" style="display: inline;" onsubmit="return confirm('Delete this service?');">
+                                <button type="submit" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;">🗑️ Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } else { %>
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 20px; color: #7f8c8d;">No services found</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+<!-- Add/Edit Service Modal -->
+<div id="serviceModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('serviceModal')">&times;</span>
+        <h2>Add New Service</h2>
+        <form method="POST" action="/admin/services/create" id="serviceForm">
+            <div class="form-group">
+                <label for="name">Service Name *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description *</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="category">Category *</label>
+                <select id="category" name="category" required>
+                    <option value="">Select Category</option>
+                    <option value="catering">🍽️ Catering</option>
+                    <option value="decoration">🎨 Decoration</option>
+                    <option value="photography">📸 Photography</option>
+                    <option value="entertainment">🎭 Entertainment</option>
+                    <option value="venue">🏢 Venue</option>
+                    <option value="transportation">🚗 Transportation</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="price">Price ($) *</label>
+                <input type="number" id="price" name="price" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Create Service</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Service Details Modal -->
+<div id="serviceDetailsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('serviceDetailsModal')">&times;</span>
+        <h2>Service Details</h2>
+        <div id="serviceDetails" style="margin-top: 20px;"></div>
+        <div class="form-group" style="margin-top: 20px;">
+            <button type="button" class="btn btn-primary" style="width: 100%;" onclick="closeModal('serviceDetailsModal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .service-row {
+        transition: background-color 0.3s ease;
+    }
+
+    .service-row:hover {
+        background-color: #f0f0f0;
+    }
+
+    select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #bdc3c7;
+        border-radius: 5px;
+        margin-top: 5px;
+    }
+
+    @media (max-width: 768px) {
+        table th:nth-child(4),
+        table td:nth-child(4) {
+            display: none;
+        }
+
+        table th:nth-child(3),
+        table td:nth-child(3) {
+            display: none;
+        }
+    }
+</style>
+
+<script>
+    function openServiceDetails(serviceId) {
+        let serviceInfo = null;
+        document.querySelectorAll('.service-row').forEach(serviceRow => {
+            if (serviceRow.querySelector('td:first-child').textContent.includes(serviceId)) {
+                serviceInfo = {
+                    id: serviceId,
+                    name: serviceRow.cells[1].textContent,
+                    category: serviceRow.getAttribute('data-category'),
+                    description: serviceRow.cells[3].textContent.replace('...', ''),
+                    price: serviceRow.cells[4].textContent.replace('$', '')
+                };
+            }
+        });
+
+        if (serviceInfo) {
+            const html = `
+                <div style="border-left: 4px solid #667eea; padding-left: 15px;">
+                    <p><strong>Service ID:</strong> #${serviceInfo.id}</p>
+                    <p><strong>Name:</strong> ${serviceInfo.name}</p>
+                    <p><strong>Category:</strong> <span class="badge badge-info">${serviceInfo.category.charAt(0).toUpperCase() + serviceInfo.category.slice(1)}</span></p>
+                    <p><strong>Description:</strong> ${serviceInfo.description}</p>
+                    <p><strong>Price:</strong> $${serviceInfo.price}</p>
+                </div>
+            `;
+            document.getElementById('serviceDetails').innerHTML = html;
+            openModal('serviceDetailsModal');
+        }
+    }
+
+    function openEditServiceModal(serviceId, name, price) {
+        alert('Edit functionality for service ID: ' + serviceId + ' coming soon!');
+    }
+</script>

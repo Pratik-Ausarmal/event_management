@@ -1,0 +1,118 @@
+<%- include('../partials/header', { title: 'Contact Us - Event Management', currentPage: 'contact' }) %>
+<%- include('../partials/navbar', { user: user, currentPage: 'contact' }) %>
+
+<div class="container py-5">
+    <h1 class="display-5 fw-bold mb-5 text-center">Contact Us</h1>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-5">
+                    <h3 class="mb-4">Send us a Message</h3>
+                    <form id="contactForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="contactName" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="contactName" required>
+                                <div class="invalid-feedback">Please enter your name.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="contactEmail" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="contactEmail" required>
+                                <div class="invalid-feedback">Please enter a valid email.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contactPhone" class="form-label">Phone Number</label>
+                            <input type="number" class="form-control" id="contactPhone">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contactSubject" class="form-label">Subject</label>
+                            <select class="form-select" id="contactSubject">
+                                <option selected>General Inquiry</option>
+                                <option>Event Booking</option>
+                                <option>Service Information</option>
+                                <option>Partnership</option>
+                                <option>Complaint</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="contactMessage" class="form-label">Message</label>
+                            <textarea class="form-control" id="contactMessage" rows="5" required></textarea>
+                            <div class="invalid-feedback">Please enter your message.</div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-paper-plane me-2"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="mb-4"><i class="fas fa-map-marker-alt text-primary me-2"></i> Our Location</h4>
+                    <div class="ratio ratio-16x9 mb-3">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3770.0521343291853!2d74.72775317544207!3d19.105368682105244!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bdcb17ca9d749e5%3A0x516744f9b2f35ec9!2sA2Z%20IT%20HUB%20PVT.%20LTD.!5e0!3m2!1sen!2sin!4v1768293130984!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="mb-4"><i class="fas fa-clock text-primary me-2"></i> Business Hours</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <strong>Monday - Friday:</strong> 9:00 AM - 6:00 PM
+                        </li>
+                        <li class="mb-2">
+                            <strong>Saturday:</strong> 10:00 AM - 4:00 PM
+                        </li>
+                        <li class="mb-2">
+                            <strong>Sunday:</strong> Closed
+                        </li>
+                        <li>
+                            <strong>Emergency:</strong> 24/7 Available
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h4 class="mb-4"><i class="fas fa-phone text-primary me-2"></i> Contact Info</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="fas fa-phone me-2 text-muted"></i>
+                            <strong>Phone:</strong> +917499950217
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-envelope me-2 text-muted"></i>
+                            <strong>Email:</strong> pratikausarmal160gmail.com
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-fax me-2 text-muted"></i>
+                            <strong>Fax:</strong> +917499950217
+                        </li>
+                        <li>
+                            <i class="fas fa-globe me-2 text-muted"></i>
+                            <strong>Website:</strong> pratikausarmal160gmail.com
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/script.js"></script>
+</body>
+</html>

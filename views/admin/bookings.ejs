@@ -1,0 +1,180 @@
+<div class="dashboard-header">
+    <h1>📋 Bookings Management</h1>
+    <p>View, manage and confirm all event bookings.</p>
+    <div class="header-actions">
+        <select id="statusFilter" onchange="filterBookings()" class="filter-select">
+            <option value="">All Bookings</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="cancelled">Cancelled</option>
+        </select>
+    </div>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Email</th>
+                <th>Event</th>
+                <th>Tickets</th>
+                <th>Total Price</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if(bookings && bookings.length > 0) { %>
+                <% bookings.forEach(booking => { %>
+                    <tr class="booking-row" data-status="<%= booking.status %>">
+                        <td><strong>#<%= booking.id %></strong></td>
+                        <td><%= booking.user_name || 'Unknown' %></td>
+                        <td><small><%= booking.user_email || 'N/A' %></small></td>
+                        <td><%= booking.event_title || 'Unknown' %></td>
+                        <td><strong><%= booking.number_of_tickets %></strong></td>
+                        <td><strong>$<%= parseFloat(booking.total_price).toFixed(2) %></strong></td>
+                        <td><%= new Date(booking.booking_date).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'}) %></td>
+                        <td>
+                            <span class="badge badge-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : 'danger' %>">
+                                <%= booking.status.charAt(0).toUpperCase() + booking.status.slice(1) %>
+                            </span>
+                        </td>
+                        <td>
+                            <% if(booking.status === 'pending') { %>
+                                <form method="POST" action="/admin/bookings/<%= booking.id %>/status" style="display: inline;">
+                                    <input type="hidden" name="status" value="confirmed">
+                                    <button type="submit" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;">✓ Confirm</button>
+                                </form>
+                            <% } %>
+                            <form method="POST" action="/admin/bookings/<%= booking.id %>/status" style="display: inline;">
+                                <input type="hidden" name="status" value="cancelled">
+                                <button type="submit" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="return confirm('Cancel this booking?');">✕ Cancel</button>
+                            </form>
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="openBookingDetails(<%= booking.id %>)">📄 Details</button>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } else { %>
+                <tr>
+                    <td colspan="9" style="text-align: center; padding: 20px; color: #7f8c8d;">No bookings found</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+<!-- Booking Details Modal -->
+<div id="bookingModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('bookingModal')">&times;</span>
+        <h2>Booking Details</h2>
+        <div id="bookingDetails" style="margin-top: 20px;"></div>
+        <div class="form-group" style="margin-top: 20px;">
+            <button type="button" class="btn btn-primary" style="width: 100%;" onclick="closeModal('bookingModal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .filter-select {
+        padding: 8px 12px;
+        border: 1px solid #bdc3c7;
+        border-radius: 5px;
+        cursor: pointer;
+        background: white;
+    }
+
+    .booking-row {
+        transition: background-color 0.3s ease;
+    }
+
+    .booking-row:hover {
+        background-color: #f0f0f0;
+    }
+
+    @media (max-width: 768px) {
+        .header-actions {
+            flex-direction: column;
+        }
+
+        .filter-select {
+            width: 100%;
+        }
+
+        table th:nth-child(n+3),
+        table td:nth-child(n+3) {
+            display: none;
+        }
+
+        table th:nth-child(1),
+        table th:nth-child(2),
+        table th:nth-child(7),
+        table th:nth-child(8),
+        table th:nth-child(9),
+        table td:nth-child(1),
+        table td:nth-child(2),
+        table td:nth-child(7),
+        table td:nth-child(8),
+        table td:nth-child(9) {
+            display: table-cell;
+        }
+    }
+</style>
+
+<script>
+    function filterBookings() {
+        const filter = document.getElementById('statusFilter').value;
+        const rows = document.querySelectorAll('.booking-row');
+        
+        rows.forEach(row => {
+            if (filter === '' || row.getAttribute('data-status') === filter) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function openBookingDetails(bookingId) {
+        const booking = findBooking(bookingId);
+        if (booking) {
+            const html = `
+                <div style="border-left: 4px solid #667eea; padding-left: 15px;">
+                    <p><strong>Booking ID:</strong> #${booking.id}</p>
+                    <p><strong>User Name:</strong> ${booking.user_name || 'Unknown'}</p>
+                    <p><strong>User Email:</strong> ${booking.user_email || 'N/A'}</p>
+                    <p><strong>Event:</strong> ${booking.event_title || 'Unknown'}</p>
+                    <p><strong>Number of Tickets:</strong> ${booking.number_of_tickets}</p>
+                    <p><strong>Total Price:</strong> $${parseFloat(booking.total_price).toFixed(2)}</p>
+                    <p><strong>Booking Date:</strong> ${new Date(booking.booking_date).toLocaleDateString()}</p>
+                    <p><strong>Status:</strong> <span class="badge badge-${booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : 'danger'}">${booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}</span></p>
+                </div>
+            `;
+            document.getElementById('bookingDetails').innerHTML = html;
+            openModal('bookingModal');
+        }
+    }
+
+    function findBooking(id) {
+        const rows = document.querySelectorAll('.booking-row');
+        for (let row of rows) {
+            const bookingId = row.querySelector('td:first-child').textContent.replace('#', '');
+            if (bookingId == id) {
+                return {
+                    id: id,
+                    user_name: row.cells[1].textContent,
+                    user_email: row.cells[2].textContent,
+                    event_title: row.cells[3].textContent,
+                    number_of_tickets: row.cells[4].textContent,
+                    total_price: row.cells[5].textContent.replace('$', '').replace(/,/g, ''),
+                    booking_date: new Date().toISOString(),
+                    status: row.getAttribute('data-status')
+                };
+            }
+        }
+        return null;
+    }
+</script>

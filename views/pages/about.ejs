@@ -1,0 +1,131 @@
+<%- include('../partials/header', { title: 'About Us - Event Management', currentPage: 'about' }) %>
+<%- include('../partials/navbar', { user: user, currentPage: 'about' }) %>
+
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold mb-4">About Mr Events</h1>
+            <p class="lead">Creating unforgettable experiences since 2020. We specialize in turning your vision into reality with precision, creativity, and excellence.</p>
+            <p>With over a decade of experience in event management, we have successfully organized more than 1000 events ranging from intimate gatherings to large-scale corporate functions and grand weddings.</p>
+        </div>
+        <div class="col-lg-6">
+            <img src="https://media.licdn.com/dms/image/v2/D4D12AQGDyMoGXvgVWg/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1714116022476?e=2147483647&v=beta&t=ZguLTYzYuQuNrVR0GG9mQWMawYEvPBFaH7eJXMVdEuc" 
+                 class="img-fluid rounded-3 shadow-lg" 
+                 alt="About A2Z Events">
+        </div>
+    </div>
+    
+    <div class="row mb-5 g-4">
+    <div class="col-md-4">
+        <div class="card service-card bg-primary bg-opacity-10 text-center h-100">
+            <div class="mb-3">
+                <i class="fas fa-bullseye fa-3x text-primary"></i>
+            </div>
+            <h3>Our Mission</h3>
+            <p>To deliver exceptional event experiences through innovative planning…</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card service-card bg-success bg-opacity-10 text-center h-100">
+            <div class="mb-3">
+                <i class="fas fa-eye fa-3x text-success"></i>
+            </div>
+            <h3>Our Vision</h3>
+            <p>To be the most trusted and preferred event management company…</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card service-card bg-warning bg-opacity-10 text-center h-100">
+            <div class="mb-3">
+                <i class="fas fa-handshake fa-3x text-warning"></i>
+            </div>
+            <h3>Our Values</h3>
+            <p>Excellence, Integrity, Creativity, Teamwork, and Client Satisfaction…</p>
+        </div>
+    </div>
+</div>
+
+        
+    
+    <h2 class="text-center mb-5">Meet Our Team</h2>
+    <div class="row g-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="team-card text-center">
+                <img src="./images/photo2.jpg" 
+                     class="rounded-circle mb-3" 
+                     alt="Mr pratik Ausarmal"
+                     style="width: 150px; height: 150px; object-fit: cover;">
+                <h5>Mr Pratik Ausarmal</h5>
+                <p class="text-muted">CEO & Founder</p>
+                <p>5+ years in event management</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="team-card text-center">
+                <img src="/images/photo1.jpg" 
+                     class="rounded-circle mb-3" 
+                     alt="Mr Yogest Kolate"
+                     style="width: 150px; height: 150px; object-fit: cover;" onerror="this.onerror=null;this.src='/images/img1.jpg'">
+                <h5>Mr Yogest Kolate</h5>
+                <p class="text-muted">Creative Director</p>
+                <p>Expert in wedding and theme events</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="team-card text-center">
+                <img src="./images/photo3.jpg" 
+                     class="rounded-circle mb-3" 
+                     alt="Mr Karan Dhadge"
+                     style="width: 150px; height: 150px; object-fit: cover;">
+                <h5>Mr Karan Dhadge</h5>
+                <p class="text-muted">Operations Manager</p>
+                <p>Specialized in corporate events</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="team-card text-center">
+                <img src="./images/photo4.jpg" 
+                     class="rounded-circle mb-3" 
+                     alt="Mr Abhishek Darandale"
+                     style="width: 150px; height: 150px; object-fit: cover;">
+                <h5>Mr Abhishek Darandale</h5>
+                <p class="text-muted">Client Relations</p>
+                <p>Ensuring client satisfaction</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm p-5">
+                <h3 class="text-center mb-4">Our Achievements</h3>
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <h2 class="display-4 text-primary">1000+</h2>
+                        <p class="text-muted">Events Organized</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h2 class="display-4 text-success">98%</h2>
+                        <p class="text-muted">Client Satisfaction</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h2 class="display-4 text-warning">50+</h2>
+                        <p class="text-muted">Awards Won</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h2 class="display-4 text-info">24/7</h2>
+                        <p class="text-muted">Customer Support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

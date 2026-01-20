@@ -1,0 +1,55 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-calendar-alt me-2"></i>Mr Events
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === 'home' ? 'active' : '' %>" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === 'events' ? 'active' : '' %>" href="/events">Events</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === 'gallery' ? 'active' : '' %>" href="/gallery">Gallery</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === 'about' ? 'active' : '' %>" href="/about">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === 'contact' ? 'active' : '' %>" href="/contact">Contact</a>
+                </li>
+                
+                <% if (user) { %>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i> <%= user.username %>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/dashboard"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                            <li><a class="dropdown-item" href="/dashboard?tab=bookings"><i class="fas fa-calendar-check me-2"></i>My Bookings</a></li>
+                            <li><a class="dropdown-item" href="/dashboard?tab=profile"><i class="fas fa-user-cog me-2"></i>Profile Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                <% } else { %>
+                    <li class="nav-item">
+                        <a class="nav-link <%= currentPage === 'login' ? 'active' : '' %>" href="/login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary ms-2" href="/register">Register</a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div style="padding-top: 76px;"><!-- Spacer for fixed navbar --></div>

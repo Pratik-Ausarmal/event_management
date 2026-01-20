@@ -1,0 +1,71 @@
+<div class="dashboard-header">
+    <h1>📊 Admin Dashboard</h1>
+    <p>Welcome, <strong><%= user.full_name || user.username %></strong>! Here's an overview of your system.</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card" onclick="location.href='/admin/users'" style="cursor: pointer;">
+        <h3>👥 Total Users</h3>
+        <div class="number"><%= stats.userCount %></div>
+        <p style="font-size: 12px; color: #95a5a6; margin-top: 10px;">Registered Members</p>
+    </div>
+    <div class="stat-card" onclick="location.href='/admin/events'" style="cursor: pointer;">
+        <h3>📅 Total Events</h3>
+        <div class="number"><%= stats.eventCount %></div>
+        <p style="font-size: 12px; color: #95a5a6; margin-top: 10px;">Active Events</p>
+    </div>
+    <div class="stat-card" onclick="location.href='/admin/bookings'" style="cursor: pointer;">
+        <h3>🎫 Total Bookings</h3>
+        <div class="number"><%= stats.bookingCount %></div>
+        <p style="font-size: 12px; color: #95a5a6; margin-top: 10px;">All Reservations</p>
+    </div>
+    <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <h3 style="color: white;">💰 Total Revenue</h3>
+        <div class="number" style="color: white;">$<%= stats.revenue.toFixed(2) %></div>
+        <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 10px;">From All Bookings</p>
+    </div>
+</div>
+
+<div class="dashboard-header">
+    <h2 style="color: #2c3e50; margin-bottom: 15px;">⚡ Quick Actions</h2>
+    <div class="header-actions" style="flex-wrap: wrap; gap: 10px;">
+        <a href="/admin/users" class="btn btn-primary">👥 Manage Users</a>
+        <a href="/admin/events" class="btn btn-primary">📅 Manage Events</a>
+        <a href="/admin/bookings" class="btn btn-primary">🎫 View Bookings</a>
+        <a href="/admin/services" class="btn btn-primary">⚙️ Manage Services</a>
+    </div>
+</div>
+
+<div class="dashboard-header">
+    <h2 style="color: #2c3e50; margin-bottom: 15px;">📈 System Information</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <div style="padding: 15px; background: #f8f9fa; border-radius: 5px; border-left: 4px solid #667eea;">
+            <strong>System Status</strong>
+            <p style="margin-top: 5px; color: #27ae60;">✅ All Systems Operational</p>
+        </div>
+        <div style="padding: 15px; background: #f8f9fa; border-radius: 5px; border-left: 4px solid #667eea;">
+            <strong>Last Updated</strong>
+            <p style="margin-top: 5px; color: #7f8c8d;">Just now</p>
+        </div>
+        <div style="padding: 15px; background: #f8f9fa; border-radius: 5px; border-left: 4px solid #667eea;">
+            <strong>Admin Access</strong>
+            <p style="margin-top: 5px; color: #27ae60;">✅ Fully Authorized</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stat-card p {
+        display: none;
+    }
+
+    @media (min-width: 769px) {
+        .stat-card p {
+            display: block;
+        }
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+    }
+</style>

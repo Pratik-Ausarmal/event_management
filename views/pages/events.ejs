@@ -1,0 +1,512 @@
+<%- include('../partials/header', { title: 'Events - Event Management', currentPage: 'events' }) %>
+<%- include('../partials/navbar', { user: user, currentPage: 'events' }) %>
+
+<div class="container py-5">
+    <!-- Page Header -->
+    <div class="row mb-5">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold">Find Your Perfect Event</h1>
+            <p class="lead text-muted">Discover amazing events that match your interests</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="/dashboard?tab=events" class="btn btn-primary btn-lg px-4">
+                <i class="fas fa-plus me-2"></i> Book Event
+            </a>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card mb-5">
+        <div class="card-body">
+            <form id="eventFilters">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Event Type</label>
+                        <select class="form-select" id="filterType">
+                            <option value="all" <%= (!filters || !filters.type || filters.type === 'all') ? 'selected' : '' %>>All Types</option>
+                            <option value="wedding" <%= (filters && filters.type === 'wedding') ? 'selected' : '' %>>Wedding</option>
+                            <option value="corporate" <%= (filters && filters.type === 'corporate') ? 'selected' : '' %>>Corporate</option>
+                            <option value="birthday" <%= (filters && filters.type === 'birthday') ? 'selected' : '' %>>Birthday</option>
+                            <option value="concert" <%= (filters && filters.type === 'concert') ? 'selected' : '' %>>Concert</option>
+                            <option value="conference" <%= (filters && filters.type === 'conference') ? 'selected' : '' %>>Conference</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-control" id="filterDate" value="<%= filters && filters.date ? filters.date : '' %>">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Min Price</label>
+                        <input type="number" class="form-control" id="filterMinPrice" placeholder="₹" value="<%= filters && filters.minPrice ? filters.minPrice : '' %>">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Max Price</label>
+                        <input type="number" class="form-control" id="filterMaxPrice" placeholder="₹" value="<%= filters && filters.maxPrice ? filters.maxPrice : '' %>">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-outline-secondary w-100" id="resetFilters">
+                            <i class="fas fa-redo me-1"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-3">
+                    <div class="col-md-9">
+                        <input type="text" id="searchKeyword" class="form-control" placeholder="Search events by title, location or description" value="<%= filters && (filters.search || filters.searchKeyword) ? (filters.search || filters.searchKeyword) : (typeof searchKeyword !== 'undefined' ? searchKeyword : '') %>">
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <button type="button" class="btn btn-primary w-100" id="applyFiltersBtn">Apply Filters</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="eventsSpinner" class="text-center my-4" style="display:none;">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+    </div>
+    
+    <!-- Events Grid -->
+    <div class="row g-4" id="eventsContainer">
+        <% if (events && events.length > 0) { %>
+            <% events.forEach(event => { %>
+            <div class="col-lg-4 col-md-6 event-card-wrap"
+                 data-type="<%= event.type %>" 
+                 data-date="<%= event.date %>"
+                 data-price="<%= event.price %>"
+                 data-event-id="<%= event.id %>">
+                <div class="event-card h-100">
+                    
+                    <!-- Carousel Images -->
+                    <div id="carousel<%= event.id %>" class="carousel slide" data-bs-ride="carousel">
+                      <div class="carousel-inner">
+                        <% if (event.images && event.images.length > 0) { %>
+                          <% event.images.forEach((img, idx) => { %>
+                            <div class="carousel-item <%= idx === 0 ? 'active' : '' %>">
+                              <img src="<%= img %>" data-src="<%= img %>" class="d-block w-100 event-img" alt="<%= event.title %>" loading="lazy" onerror="console.warn('Event image failed to load:', this.dataset.src); this.onerror=null; this.src=(event.localFallback || '/images/img1.jpg');">
+                            </div>
+                          <% }); %>
+                        <% } else { %>
+                          <div class="carousel-item active">
+                            <img src="<%= event.image_url || event.localFallback %>" class="event-img" alt="<%= event.title %>" onerror="this.onerror=null;this.src=('<%= event.localFallback %>')">
+
+                          </div>
+                        <% } %>
+                      </div>
+                      <button class="carousel-control-prev" type="button" data-bs-target="#carousel<%= event.id %>" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                      </button>
+                      <button class="carousel-control-next" type="button" data-bs-target="#carousel<%= event.id %>" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                      </button>
+                    </div>
+                    
+                    <div class="p-4">
+                        <h5 class="mb-2"><%= event.title %></h5>
+                        <p class="text-muted mb-3"><%= event.description.substring(0, 120) %>...</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-calendar me-1"></i> 
+                                    <%= new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) %>
+                                </small>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i> <%= event.time %>
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-map-marker-alt me-1"></i> <%= event.location %>
+                                </small>
+                                <small class="text-muted">
+                                    <i class="fas fa-users me-1"></i> <%= event.capacity %> seats
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary flex-grow-1 viewDetailsBtn" data-id="<%= event.id %>">View Details</button>
+                            <a href="/booking/<%= event.id %>" class="btn btn-primary">
+                                <i class="fas fa-ticket-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        <% } else { %>
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-calendar-times fa-4x text-muted mb-4"></i>
+                <h3>No Events Found</h3>
+                <p class="text-muted mb-4">Try adjusting your filters or check back later for new events.</p>
+            </div>
+        <% } %>
+    </div>
+    
+    <!-- Pagination (optional) -->
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+            <!-- Add pagination here if needed -->
+        </ul>
+    </nav>
+</div>
+
+<!-- Quick Booking Modal -->
+<div class="modal fade" id="quickBookModal" tabindex="-1" aria-labelledby="quickBookLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="quickBookLabel">Quick Book</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="quickBookForm">
+          <input type="hidden" name="eventId" id="quickBookEventId">
+          <div class="mb-3">
+            <label class="form-label">Event</label>
+            <input type="text" class="form-control" id="quickBookEventTitle" readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Guests</label>
+            <input type="number" class="form-control" id="quickBookGuests" name="guestCount" min="1" value="1" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Estimated Total</label>
+            <div class="fw-bold" id="quickBookTotal">₹0</div>
+          </div>
+          <div id="quickBookAlert" class="alert" style="display:none;"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" id="quickBookSubmit" class="btn btn-primary">Confirm Booking</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Event Details Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="eventModalContent">
+          <div class="text-center mb-3" id="eventModalImageWrap">
+            <div id="eventModalCarousel" class="carousel slide" data-bs-ride="carousel">
+              <div class="carousel-inner" id="eventModalCarouselInner"></div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#eventModalCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#eventModalCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+              </button>
+            </div>
+          </div>
+          <h4 id="eventModalTitle"></h4>
+          <p id="eventModalDate" class="text-muted"></p>
+          <p id="eventModalLocation" class="text-muted"></p>
+          <p id="eventModalDescription"></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#" id="eventModalBookBtn" class="btn btn-primary">Book Now</a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Filters Script -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const typeFilter = document.getElementById('filterType');
+    const dateFilter = document.getElementById('filterDate');
+    const minFilter = document.getElementById('filterMinPrice');
+    const maxFilter = document.getElementById('filterMaxPrice');
+    const searchInput = document.getElementById('searchKeyword');
+    const eventsContainer = document.getElementById('eventsContainer');
+    const spinner = document.getElementById('eventsSpinner');
+    const applyBtn = document.getElementById('applyFiltersBtn');
+
+    // For debugging: set title for existing images so hover shows the requested URL
+    document.querySelectorAll('.event-img').forEach(img => { try { img.title = img.src; } catch(e) {} });
+
+    // Local image pool for ensuring varied images across the events grid
+    const imagePool = ['/images/img1.jpg','/images/img2.jpg','/images/img3.jpg','/images/img4.jpg','/images/img5.jpg','/images/img6.svg','/images/img7.svg','/images/img8.svg','/images/img9.svg','/images/photo2.jpg','/images/photo3.jpg','/images/photo4.jpg'];
+
+    function renderEventCard(event, index) {
+        const image = event.image_url || event.localFallback || imagePool[index % imagePool.length];
+        const safeTitle = event.title || '';
+        const safeDesc = (event.description || '').substring(0,120);
+        const dateStr = event.date ? new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : '';
+
+        return `
+        <div class="col-lg-4 col-md-6 event-card-wrap" data-type="${event.type}" data-date="${event.date}" data-price="${event.price}" data-event-id="${event.id}">
+          <div class="event-card h-100">
+            <div class="position-relative">
+              <div class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                  <div class="carousel-item active">
+                    <img src="${image}" class="d-block w-100 event-img" alt="${safeTitle}" loading="lazy" onerror="console.warn('Event image failed to load:', this.src); this.onerror=null; this.src='${event.localFallback || imagePool[index % imagePool.length]}'">
+                  </div>
+                </div>
+              </div>
+              ${Array.isArray(event.images) && event.images.length > 1 ? `<span class="badge bg-dark text-white position-absolute" style="top:10px;left:10px;">Gallery</span>` : ''}
+            </div>
+            <div class="p-4">
+                <h5 class="mb-2">${safeTitle}</h5>
+                <p class="text-muted mb-3">${safeDesc}...</p>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <small class="text-muted d-block"><i class="fas fa-calendar me-1"></i>${dateStr}</small>
+                        <small class="text-muted"><i class="fas fa-clock me-1"></i> ${event.time || ''}</small>
+                    </div>
+                    <div class="text-end">
+                        <small class="text-muted d-block"><i class="fas fa-map-marker-alt me-1"></i> ${event.location || ''}</small>
+                        <small class="text-muted"><i class="fas fa-users me-1"></i> ${event.capacity || ''} seats</small>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-primary flex-grow-1 viewDetailsBtn" data-id="${event.id}">View Details</button>
+                    <button type="button" class="btn btn-primary quickBookBtn" data-id="${event.id}" data-price="${event.price}"><i class="fas fa-ticket-alt"></i></button>
+                </div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function renderEvents(events) {
+        if (!Array.isArray(events) || events.length === 0) {
+            eventsContainer.innerHTML = `<div class="col-12 text-center py-5"><i class="fas fa-calendar-times fa-4x text-muted mb-4"></i><h3>No Events Found</h3><p class="text-muted mb-4">Try adjusting your filters or check back later for new events.</p></div>`;
+            return;
+        }
+        const html = events.map((e, i) => renderEventCard(e, i)).join('');
+        eventsContainer.innerHTML = html;
+        // Add debug info: set title to image src so hover shows the URL
+        document.querySelectorAll('.event-img').forEach(img => {
+            try { img.title = img.src; } catch (e) {}
+        });
+    }
+
+    function buildQuery() {
+        const params = new URLSearchParams();
+        if (typeFilter.value && typeFilter.value !== 'all') params.set('type', typeFilter.value);
+        if (dateFilter.value) params.set('date', dateFilter.value);
+        if (minFilter.value) params.set('minPrice', minFilter.value);
+        if (maxFilter.value) params.set('maxPrice', maxFilter.value);
+        if (searchInput.value) params.set('search', searchInput.value);
+        return params.toString();
+    }
+
+    function showSpinner(show) {
+        spinner.style.display = show ? 'block' : 'none';
+    }
+
+    let fetchTimeout = null;
+    function fetchEvents(debounce = true) {
+        if (debounce) {
+            clearTimeout(fetchTimeout);
+            fetchTimeout = setTimeout(() => fetchEvents(false), 300);
+            return;
+        }
+        const q = buildQuery();
+        showSpinner(true);
+        fetch('/api/events?' + q)
+            .then(res => res.json())
+            .then(json => {
+                showSpinner(false);
+                renderEvents(json.data || []);
+            })
+            .catch(err => {
+                showSpinner(false);
+                console.error('Error fetching events:', err);
+            });
+    }
+
+    applyBtn.addEventListener('click', () => fetchEvents(false));
+    document.getElementById('resetFilters').addEventListener('click', () => {
+        typeFilter.value = 'all';
+        dateFilter.value = '';
+        minFilter.value = '';
+        maxFilter.value = '';
+        searchInput.value = '';
+        fetchEvents(false);
+    });
+
+    // Auto-fetch on filter changes with debounce
+    [typeFilter, dateFilter, minFilter, maxFilter, searchInput].forEach(el => {
+        el.addEventListener('input', () => fetchEvents(true));
+        el.addEventListener('change', () => fetchEvents(true));
+    });
+
+    // Initial load: don't replace server-rendered content unless user filters
+    // But we can prefetch to keep UI up-to-date in background
+    fetch('/api/events')
+        .then(res => res.json())
+        .then(json => {
+            // only update if we have a significantly different list (optional)
+            // For now, keep server-rendered initial; but we could call renderEvents(json.data)
+            console.log('[EVENTS] Prefetched', (json.data||[]).length, 'events');
+        })
+        .catch(() => {});
+
+
+    // Event details modal (AJAX) and Quick Booking handling
+    document.addEventListener('click', (e) => {
+        // Event details
+        const detailsBtn = e.target.closest('.viewDetailsBtn');
+        if (detailsBtn) {
+            const id = detailsBtn.dataset.id;
+            if (!id) return;
+
+            const modalEl = document.getElementById('eventModal');
+            const modalImage = document.getElementById('eventModalImage');
+            const modalTitle = document.getElementById('eventModalTitle');
+            const modalDate = document.getElementById('eventModalDate');
+            const modalLocation = document.getElementById('eventModalLocation');
+            const modalDescription = document.getElementById('eventModalDescription');
+            const modalBookBtn = document.getElementById('eventModalBookBtn');
+
+            // show loading state
+            modalTitle.textContent = 'Loading...';
+            modalDate.textContent = '';
+            modalLocation.textContent = '';
+            modalDescription.textContent = '';
+            // Clear carousel
+            const carouselInner = document.getElementById('eventModalCarouselInner');
+            carouselInner.innerHTML = '<div class="text-center py-4">Loading...</div>';
+            modalBookBtn.href = '#';
+
+            fetch(`/event/${id}`, { headers: { 'Accept': 'application/json' } })
+                .then(res => {
+                    if (!res.ok) return res.text().then(t => { throw new Error(t || res.status); });
+                    return res.json();
+                })
+                .then(json => {
+                    const event = (json && json.data) ? json.data : json;
+                    modalTitle.textContent = event.title || 'Event';
+                    modalDate.textContent = (event.date) ? new Date(event.date).toLocaleString() : '';
+                    modalLocation.textContent = event.location || '';
+                    modalDescription.textContent = event.description || '';
+                    modalBookBtn.href = `/booking/${event.id}`;
+
+// Build carousel items from gallery_images or image_url/fallback (use imagePool fallback for consistency)
+                const images = (event.gallery_images && event.gallery_images.length > 0)
+                    ? event.gallery_images
+                    : ((event.images && event.images.length>0)
+                        ? event.images
+                        : [event.image_url || imagePool[(event.id % imagePool.length)]
+                      ]);
+
+                    const carouselInner = document.getElementById('eventModalCarouselInner');
+                    carouselInner.innerHTML = images.map((img, idx) => `
+                        <div class="carousel-item ${idx===0? 'active' : ''}">
+                            <img src="${img}" class="d-block w-100" alt="${event.title || ''}" onerror="this.onerror=null;this.src='${event.localFallback || ('/images/img' + ((event.id % 5) + 1) + '.jpg')}';">
+                        </div>
+                    `).join('');
+
+                    // Initialize carousel (resetting if exists)
+                    try {
+                        const carouselEl = document.getElementById('eventModalCarousel');
+                        // Dispose previous instance if any
+                        if (carouselEl._bs) {
+                            try { carouselEl._bs.dispose(); } catch (e) { /* ignore */ }
+                        }
+                        const bs = new bootstrap.Carousel(carouselEl);
+                        carouselEl._bs = bs;
+                    } catch (e) {
+                        console.warn('Unable to init modal carousel', e);
+                    }
+
+                    const bsModal = new bootstrap.Modal(modalEl);
+                    bsModal.show();
+                })
+                .catch(err => {
+                    modalTitle.textContent = 'Error loading event';
+                    modalDescription.textContent = err.message || String(err);
+                    const bsModal = new bootstrap.Modal(modalEl);
+                    bsModal.show();
+                });
+
+            return;
+        }
+
+        // Quick book
+        const quickBtn = e.target.closest('.quickBookBtn');
+        if (quickBtn) {
+            const id = quickBtn.dataset.id;
+            const price = Number(quickBtn.dataset.price || 0);
+            if (!id) return;
+
+            // Prefill modal
+            document.getElementById('quickBookEventId').value = id;
+            document.getElementById('quickBookEventTitle').value = quickBtn.closest('.event-card').querySelector('h5').textContent || '';
+            document.getElementById('quickBookGuests').value = 1;
+            document.getElementById('quickBookTotal').textContent = '₹' + (price * 1);
+            document.getElementById('quickBookAlert').style.display = 'none';
+
+            // store price
+            document.getElementById('quickBookForm').dataset.price = price;
+
+            const bs = new bootstrap.Modal(document.getElementById('quickBookModal'));
+            bs.show();
+            return;
+        }
+    });
+
+    // Update estimated total when guests change
+    document.getElementById('quickBookGuests').addEventListener('input', function () {
+        const guests = Number(this.value || 1);
+        const price = Number(document.getElementById('quickBookForm').dataset.price || 0);
+        document.getElementById('quickBookTotal').textContent = '₹' + (guests * price);
+    });
+
+    // Submit quick booking via AJAX
+    document.getElementById('quickBookSubmit').addEventListener('click', function () {
+        const form = document.getElementById('quickBookForm');
+        const eventId = form.eventId.value;
+        const guestCount = Number(form.guestCount.value || 1);
+
+        const payload = { eventId, guestCount };
+        const alertEl = document.getElementById('quickBookAlert');
+        alertEl.style.display = 'none';
+
+        fetch('/booking/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(res => {
+            if (res.status === 401) throw new Error('Unauthorized');
+            return res.json();
+        })
+        .then(json => {
+            if (json.success) {
+                alertEl.className = 'alert alert-success';
+                alertEl.textContent = 'Booking successful! Redirecting to dashboard...';
+                alertEl.style.display = 'block';
+                setTimeout(() => { window.location = '/dashboard'; }, 1200);
+            } else {
+                throw new Error(json.message || 'Booking failed');
+            }
+        })
+        .catch(err => {
+            alertEl.className = 'alert alert-danger';
+            alertEl.textContent = err.message || 'Booking failed';
+            alertEl.style.display = 'block';
+        });
+    });
+});
+</script>
+</body>
+</html>

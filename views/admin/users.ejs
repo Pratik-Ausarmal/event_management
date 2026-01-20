@@ -1,0 +1,213 @@
+<div class="dashboard-header">
+    <h1>👥 Users Management</h1>
+    <p>Manage all registered users, roles, and profiles.</p>
+    <div class="header-actions">
+        <select id="roleFilter" onchange="filterByRole()" class="filter-select">
+            <option value="">All Users</option>
+            <option value="user">Customers</option>
+            <option value="organizer">Organizers</option>
+            <option value="admin">Admins</option>
+        </select>
+    </div>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Joined</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if(users && users.length > 0) { %>
+                <% users.forEach(user => { %>
+                    <tr class="user-row" data-role="<%= user.role %>">
+                        <td><strong>#<%= user.id %></strong></td>
+                        <td><%= user.username %></td>
+                        <td><%= user.full_name || '-' %></td>
+                        <td><small><%= user.email %></small></td>
+                        <td><%= user.phone || '-' %></td>
+                        <td>
+                            <span class="badge badge-<%= user.role === 'admin' ? 'danger' : user.role === 'organizer' ? 'warning' : 'info' %>">
+                                <%= user.role.charAt(0).toUpperCase() + user.role.slice(1) %>
+                            </span>
+                        </td>
+                        <td><small><%= new Date(user.created_at).toLocaleDateString() %></small></td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="openUserDetails(<%= user.id %>)">👁️ View</button>
+                            <button class="btn btn-warning" style="padding: 5px 10px; font-size: 12px;" onclick="openChangeRoleModal(<%= user.id %>, '<%= user.username %>', '<%= user.role %>')">🔄 Role</button>
+                            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteUser(<%= user.id %>, '<%= user.username %>')">🗑️ Delete</button>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } else { %>
+                <tr>
+                    <td colspan="8" style="text-align: center; padding: 20px; color: #7f8c8d;">No users found</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+<!-- User Details Modal -->
+<div id="userModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('userModal')">&times;</span>
+        <h2>User Profile</h2>
+        <div id="userDetails" style="margin-top: 20px;"></div>
+        <div class="form-group" style="margin-top: 20px;">
+            <button type="button" class="btn btn-primary" style="width: 100%;" onclick="closeModal('userModal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Change Role Modal -->
+<div id="roleModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('roleModal')">&times;</span>
+        <h2>Change User Role</h2>
+        <form method="POST" action="/admin/users/change-role" id="roleForm" style="margin-top: 20px;">
+            <input type="hidden" name="userId" id="changeRoleUserId">
+            <div class="form-group">
+                <label for="newRole">Select New Role:</label>
+                <select id="newRole" name="role" required>
+                    <option value="user">Customer</option>
+                    <option value="organizer">Organizer</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Update Role</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .filter-select {
+        padding: 8px 12px;
+        border: 1px solid #bdc3c7;
+        border-radius: 5px;
+        cursor: pointer;
+        background: white;
+    }
+
+    .user-row {
+        transition: background-color 0.3s ease;
+    }
+
+    .user-row:hover {
+        background-color: #f0f0f0;
+    }
+
+    select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #bdc3c7;
+        border-radius: 5px;
+        margin-top: 5px;
+    }
+
+    @media (max-width: 768px) {
+        .header-actions {
+            flex-direction: column;
+        }
+
+        .filter-select {
+            width: 100%;
+        }
+
+        table th:nth-child(n+4),
+        table td:nth-child(n+4) {
+            display: none;
+        }
+
+        table th:nth-child(1),
+        table th:nth-child(2),
+        table th:nth-child(3),
+        table th:nth-child(6),
+        table th:nth-child(8),
+        table td:nth-child(1),
+        table td:nth-child(2),
+        table td:nth-child(3),
+        table td:nth-child(6),
+        table td:nth-child(8) {
+            display: table-cell;
+        }
+    }
+</style>
+
+<script>
+    function filterByRole() {
+        const filter = document.getElementById('roleFilter').value;
+        const rows = document.querySelectorAll('.user-row');
+        
+        rows.forEach(row => {
+            if (filter === '' || row.getAttribute('data-role') === filter) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function openUserDetails(userId) {
+        const row = document.querySelector(`.user-row:has(td:first-child:contains(#${userId}))`);
+        const cells = document.querySelectorAll(`.user-row td`);
+        
+        let userInfo = null;
+        document.querySelectorAll('.user-row').forEach(userRow => {
+            if (userRow.querySelector('td:first-child').textContent.includes(userId)) {
+                userInfo = {
+                    id: userId,
+                    username: userRow.cells[1].textContent,
+                    fullName: userRow.cells[2].textContent,
+                    email: userRow.cells[3].textContent,
+                    phone: userRow.cells[4].textContent,
+                    role: userRow.getAttribute('data-role'),
+                    joinDate: userRow.cells[6].textContent
+                };
+            }
+        });
+
+        if (userInfo) {
+            const html = `
+                <div style="border-left: 4px solid #667eea; padding-left: 15px;">
+                    <p><strong>User ID:</strong> #${userInfo.id}</p>
+                    <p><strong>Username:</strong> ${userInfo.username}</p>
+                    <p><strong>Full Name:</strong> ${userInfo.fullName || 'Not provided'}</p>
+                    <p><strong>Email:</strong> ${userInfo.email}</p>
+                    <p><strong>Phone:</strong> ${userInfo.phone || 'Not provided'}</p>
+                    <p><strong>Role:</strong> <span class="badge badge-${userInfo.role === 'admin' ? 'danger' : userInfo.role === 'organizer' ? 'warning' : 'info'}">${userInfo.role.charAt(0).toUpperCase() + userInfo.role.slice(1)}</span></p>
+                    <p><strong>Member Since:</strong> ${userInfo.joinDate}</p>
+                </div>
+            `;
+            document.getElementById('userDetails').innerHTML = html;
+            openModal('userModal');
+        }
+    }
+
+    function openChangeRoleModal(userId, username, currentRole) {
+        document.getElementById('changeRoleUserId').value = userId;
+        document.getElementById('newRole').value = currentRole;
+        document.querySelector('#roleModal h2').textContent = `Change Role for ${username}`;
+        openModal('roleModal');
+    }
+
+    function deleteUser(userId, username) {
+        if (confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/users/${userId}/delete`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>

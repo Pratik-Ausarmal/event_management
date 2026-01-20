@@ -1,0 +1,183 @@
+<div class="dashboard-header">
+    <h1>📅 Events Management</h1>
+    <p>Manage all events in the system.</p>
+    <div class="header-actions">
+        <select id="typeFilter" onchange="filterByType()" class="filter-select">
+            <option value="">All Events</option>
+            <option value="wedding">Wedding</option>
+            <option value="corporate">Corporate</option>
+            <option value="birthday">Birthday</option>
+            <option value="concert">Concert</option>
+            <option value="conference">Conference</option>
+            <option value="other">Other</option>
+        </select>
+    </div>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Location</th>
+                <th>Price</th>
+                <th>Capacity</th>
+                <th>Organizer</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if(events && events.length > 0) { %>
+                <% events.forEach(event => { %>
+                    <tr class="event-row" data-type="<%= event.type %>">
+                        <td><strong>#<%= event.id %></strong></td>
+                        <td><strong><%= event.title %></strong></td>
+                        <td>
+                            <span class="badge badge-info">
+                                <%= event.type.charAt(0).toUpperCase() + event.type.slice(1) %>
+                            </span>
+                        </td>
+                        <td><%= new Date(event.date).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'}) %></td>
+                        <td><%= event.time %></td>
+                        <td><small><%= event.location %></small></td>
+                        <td><strong>$<%= parseFloat(event.price).toFixed(2) %></strong></td>
+                        <td><span style="background: #e8f4f8; padding: 3px 8px; border-radius: 3px;"><%= event.capacity %></span></td>
+                        <td><small><%= event.organizer_name || 'System' %></small></td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="openEventDetails(<%= event.id %>)">👁️ View</button>
+                            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteEvent(<%= event.id %>, '<%= event.title %>')">🗑️ Delete</button>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } else { %>
+                <tr>
+                    <td colspan="10" style="text-align: center; padding: 20px; color: #7f8c8d;">No events found</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+<!-- Event Details Modal -->
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('eventModal')">&times;</span>
+        <h2>Event Details</h2>
+        <div id="eventDetails" style="margin-top: 20px;"></div>
+        <div class="form-group" style="margin-top: 20px;">
+            <button type="button" class="btn btn-primary" style="width: 100%;" onclick="closeModal('eventModal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .filter-select {
+        padding: 8px 12px;
+        border: 1px solid #bdc3c7;
+        border-radius: 5px;
+        cursor: pointer;
+        background: white;
+    }
+
+    .event-row {
+        transition: background-color 0.3s ease;
+    }
+
+    .event-row:hover {
+        background-color: #f0f0f0;
+    }
+
+    @media (max-width: 768px) {
+        .header-actions {
+            flex-direction: column;
+        }
+
+        .filter-select {
+            width: 100%;
+        }
+
+        table th:nth-child(n+5),
+        table td:nth-child(n+5) {
+            display: none;
+        }
+
+        table th:nth-child(1),
+        table th:nth-child(2),
+        table th:nth-child(3),
+        table th:nth-child(4),
+        table th:nth-child(10),
+        table td:nth-child(1),
+        table td:nth-child(2),
+        table td:nth-child(3),
+        table td:nth-child(4),
+        table td:nth-child(10) {
+            display: table-cell;
+        }
+    }
+</style>
+
+<script>
+    function filterByType() {
+        const filter = document.getElementById('typeFilter').value;
+        const rows = document.querySelectorAll('.event-row');
+        
+        rows.forEach(row => {
+            if (filter === '' || row.getAttribute('data-type') === filter) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function openEventDetails(eventId) {
+        let eventInfo = null;
+        document.querySelectorAll('.event-row').forEach(eventRow => {
+            if (eventRow.querySelector('td:first-child').textContent.includes(eventId)) {
+                eventInfo = {
+                    id: eventId,
+                    title: eventRow.cells[1].textContent,
+                    type: eventRow.getAttribute('data-type'),
+                    date: eventRow.cells[3].textContent,
+                    time: eventRow.cells[4].textContent,
+                    location: eventRow.cells[5].textContent,
+                    price: eventRow.cells[6].textContent.replace('$', ''),
+                    capacity: eventRow.cells[7].textContent.trim(),
+                    organizer: eventRow.cells[8].textContent
+                };
+            }
+        });
+
+        if (eventInfo) {
+            const html = `
+                <div style="border-left: 4px solid #667eea; padding-left: 15px;">
+                    <p><strong>Event ID:</strong> #${eventInfo.id}</p>
+                    <p><strong>Title:</strong> ${eventInfo.title}</p>
+                    <p><strong>Type:</strong> <span class="badge badge-info">${eventInfo.type.charAt(0).toUpperCase() + eventInfo.type.slice(1)}</span></p>
+                    <p><strong>Date:</strong> ${eventInfo.date}</p>
+                    <p><strong>Time:</strong> ${eventInfo.time}</p>
+                    <p><strong>Location:</strong> ${eventInfo.location}</p>
+                    <p><strong>Price:</strong> $${eventInfo.price}</p>
+                    <p><strong>Capacity:</strong> ${eventInfo.capacity} persons</p>
+                    <p><strong>Organizer:</strong> ${eventInfo.organizer}</p>
+                </div>
+            `;
+            document.getElementById('eventDetails').innerHTML = html;
+            openModal('eventModal');
+        }
+    }
+
+    function deleteEvent(eventId, title) {
+        if (confirm(`Are you sure you want to delete the event "${title}"? This action cannot be undone.`)) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/events/${eventId}/delete`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>

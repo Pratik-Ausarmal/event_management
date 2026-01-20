@@ -1,0 +1,277 @@
+<%- include('../partials/header', { title: 'Home - Event Management', currentPage: 'home' }) %>
+<%- include('../partials/navbar', { user: user, currentPage: 'home' }) %>
+
+<!-- AOS Animation CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center">
+
+      <div class="col-lg-6" data-aos="fade-right">
+        <h4 class="hero-dynamic-text">
+          <span id="dynamic-text"></span><span class="cursor">|</span>
+        </h4>
+        <p>From intimate gatherings to grand celebrations, we handle every detail with precision and creativity.</p>
+        <a href="/events" class="cta-button">Explore Events</a>
+        <a href="/contact" class="btn btn-outline-light ms-3 px-4 py-3 rounded-pill">Get Quote</a>
+      </div>
+
+
+
+      <div class="col-lg-6">
+        <div class="multi-swap-img" data-aos="fade-left">
+          <img src="./images/img1.jpg" class="img1" alt="Image 1">
+          <img src="./images/img2.jpg" class="img2" alt="Image 2">
+          <img src="./images/img3.jpg" class="img3" alt="Image 3">
+          <img src="./images/img4.jpg" class="img4" alt="Image 4">
+          <img src="./images/img5.jpg" class="img5" alt="Image 5">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Services Section -->
+<section class="services-section">
+  <div class="container">
+    <div class="section-title">
+      <h2 data-aos="fade-up">Our Services</h2>
+      <p class="text-muted" data-aos="fade-up" data-aos-delay="200">Comprehensive event solutions tailored to your needs</p>
+    </div>
+    
+    <div class="row g-4">
+      <div class="col-md-3" data-aos="zoom-in">
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-ring"></i></div>
+          <h4>Wedding Planning</h4>
+          <p class="text-muted">Complete wedding planning and coordination.</p>
+        </div>
+      </div>
+      <div class="col-md-3" data-aos="zoom-in" data-aos-delay="100">
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-briefcase"></i></div>
+          <h4>Corporate Events</h4>
+          <p class="text-muted">Professional event management for corporate functions.</p>
+        </div>
+      </div>
+      <div class="col-md-3" data-aos="zoom-in" data-aos-delay="200">
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-birthday-cake"></i></div>
+          <h4>Birthday Parties</h4>
+          <p class="text-muted">Fun and memorable birthday celebrations.</p>
+        </div>
+      </div>
+      <div class="col-md-3" data-aos="zoom-in" data-aos-delay="300">
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-music"></i></div>
+          <h4>Concerts & Shows</h4>
+          <p class="text-muted">Production and management of musical events.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Upcoming Events Section -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="section-title">
+      <h2 data-aos="fade-up">Upcoming Events</h2>
+      <p class="text-muted" data-aos="fade-up" data-aos-delay="200">Join our exciting upcoming events</p>
+    </div>
+    
+    <div class="row g-4">
+      <% if (events && events.length > 0) { %>
+        <% events.forEach((event, i) => { %>
+          <div class="col-md-4" data-aos="fade-up" data-aos-delay="<%= i * 100 %>">
+            <div class="event-card">
+              <div class="position-relative">
+                <img src="<%= event.image_url || event.localFallback || '/images/img1.jpg' %>" onerror="this.onerror=null;this.src=(event.localFallback || '/images/img1.jpg')"
+                     class="event-img" alt="<%= event.title %>">
+                <span class="event-type"><%= event.type %></span>
+              </div>
+              <div class="p-4">
+                <h5><%= event.title %></h5>
+                <p class="text-muted mb-2"><%= event.description.substring(0, 100) %>...</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <small class="text-muted"><i class="fas fa-calendar me-1"></i><%= new Date(event.date).toLocaleDateString() %></small>
+                    <br>
+                    <small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i><%= event.location %></small>
+                  </div>
+                  <span class="badge bg-primary fs-6">$<%= event.price %></span>
+                </div>
+                <a href="/event/<%= event.id %>" class="btn btn-outline-primary w-100 mt-3">View Details</a>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+       <div class="col-12 text-center no-events-box">
+
+  <img 
+  src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=600&q=80" 
+  alt="Wedding/Event Decoration" 
+  class="no-events-image mb-3"
+  data-aos="zoom-in"
+  data-aos-delay="200"
+/>
+
+
+  
+
+  <p class="text-muted">
+    We are currently preparing exciting new events for you.  
+    Stay tuned and check back soon to discover amazing experiences, workshops, and celebrations.
+  </p>
+
+  <a href="/events" class="btn btn-primary mt-2">
+    Browse All Events
+  </a>
+
+</div>
+
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="section-title">
+      <h2 data-aos="fade-up">What Our Clients Say</h2>
+      <p class="text-muted" data-aos="fade-up" data-aos-delay="200">Hear from our satisfied customers</p>
+    </div>
+    
+    <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel" data-aos="fade-up" data-aos-delay="300">
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <div class="row justify-content-center">
+            <div class="col-md-8">
+              <div class="testimonial-card p-5 rounded-4 shadow-sm">
+                <div class="text-center mb-4"><i class="fas fa-quote-left fa-3x text-primary opacity-25"></i></div>
+                <p class="fs-5 text-center mb-4">"The team at EventPro made our wedding absolutely magical."</p>
+                <div class="text-center"><h5 class="mb-1">Pavan Savant</h5><p class="text-muted">Wedding Client</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="row justify-content-center">
+            <div class="col-md-8">
+              <div class="testimonial-card p-5 rounded-4 shadow-sm">
+                <div class="text-center mb-4"><i class="fas fa-quote-left fa-3x text-primary opacity-25"></i></div>
+                <p class="fs-5 text-center mb-4">"Our corporate conference was a huge success thanks to EventPro."</p>
+                <div class="text-center"><h5 class="mb-1">Rahul Misal</h5><p class="text-muted">Corporate Client</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AOS Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>AOS.init({ duration: 1000, once: true });</script>
+
+<!-- Hero Image Swap Script -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const containers = document.querySelectorAll('.multi-swap-img');
+
+  containers.forEach(container => {
+    const images = Array.from(container.querySelectorAll('img'));
+    let currentIndex = 0;
+    let intervalId = null;
+
+    images.forEach((img, index) => {
+      img.style.opacity = index === 0 ? '1' : '0';
+      img.style.transition = 'opacity 0.8s ease';
+    });
+
+    const startSwap = () => {
+      if (intervalId) return;
+      intervalId = setInterval(() => {
+        images[currentIndex].style.opacity = '0';
+        currentIndex = (currentIndex + 1) % images.length;
+        images[currentIndex].style.opacity = '1';
+      }, 1500);
+    };
+
+    const stopSwap = () => {
+      clearInterval(intervalId);
+      intervalId = null;
+      images.forEach((img, i) => img.style.opacity = i === 0 ? '1' : '0');
+    };
+
+    container.addEventListener('mouseenter', startSwap);
+    container.addEventListener('mouseleave', stopSwap);
+  });
+});
+</script>
+
+<%- include('../partials/footer') %>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const dynamicText = document.getElementById("dynamic-text");
+  if (!dynamicText) {
+    console.error("Typing animation: #dynamic-text not found");
+    return;
+  }
+
+  const phrases = [
+    "Create Unforgettable Events",
+    "Create Magical Memories",
+    "Create Stunning Experiences",
+    "Create Perfect Celebrations",
+    "Create Joyful Gatherings",
+    "Create Spectacular Moments",
+    "Our efforts, Your Celebrationss"
+  ];
+
+  let phraseIndex = 0;
+  let charIndex = 0;
+  let isDeleting = false;
+
+  function typeLoop() {
+    const current = phrases[phraseIndex];
+
+    if (!isDeleting) {
+      dynamicText.textContent = current.slice(0, charIndex + 1);
+      charIndex++;
+    } else {
+      dynamicText.textContent = current.slice(0, charIndex - 1);
+      charIndex--;
+    }
+
+    // finished typing this phrase
+    if (!isDeleting && charIndex === current.length) {
+      isDeleting = true;
+      setTimeout(typeLoop, 1400); // pause before deleting
+      return;
+    }
+    // fully deleted, move to next
+    if (isDeleting && charIndex === 0) {
+      isDeleting = false;
+      phraseIndex = (phraseIndex + 1) % phrases.length;
+    }
+
+    setTimeout(typeLoop, isDeleting ? 80 : 120);
+  }
+
+  typeLoop();
+});
+</script>
+
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/script.js"></script>
+</body>
+</html>
