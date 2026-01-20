@@ -135,15 +135,19 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+// ✅ Required for Render / reverse proxy
+app.set("trust proxy", 1);
+
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'event-secret-key',
+    name: "event.sid",
+    secret: process.env.SESSION_SECRET || "event-secret-key",
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 86400000,
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
         httpOnly: true,
-        sameSite: 'lax',
-        secure: (process.env.NODE_ENV === 'production')
+        secure: true,      // Render uses HTTPS
+        sameSite: "none"   // Required for cross-site cookies on cloud
     }
 }));
 
